@@ -1,6 +1,7 @@
 <?php
 
-define('ROOT' , dirname(__DIR__));
+define('PUBLIC_ROOT' , dirname(__DIR__));
+define('CORE_ROOT' , dirname(PUBLIC_ROOT));
 
 //error_reporting(E_ALL);
 

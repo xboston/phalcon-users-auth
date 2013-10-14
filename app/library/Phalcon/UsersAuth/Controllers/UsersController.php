@@ -1,22 +1,27 @@
 <?php
 
+/**
+ *
+ */
 namespace Phalcon\UsersAuth\Controllers {
+
+    use \Phalcon\Mvc\Controller , \Phalcon\UsersAuth\Forms\RegisterForm , \Phalcon\UsersAuth\Models\Users , \Phalcon\UsersAuth\Models\EmailConfirmations , \Phalcon\UsersAuth\Forms\LoginForm ,
+        \Phalcon\UsersAuth\Forms\ForgotPasswordForm , \Phalcon\UsersAuth\Library\Auth\Exception\Exception , \Phalcon\UsersAuth\Models\ResetPasswords , \Phalcon\UsersAuth\Forms\ChangePasswordForm ,
+        \Phalcon\UsersAuth\Models\PasswordChanges , \Phalcon\UsersAuth\Forms\UsersForm;
 
     /**
      * Example UsersController class
      *
      * @property \Phalcon\UsersAuth\Library\Auth\Auth $auth
      */
-    class UsersController extends \Phalcon\Mvc\Controller
+    class UsersController extends Controller
     {
 
+        /**
+         *
+         */
         public function indexAction()
         {
-
-            $user = $this->auth->getUser();
-            print_r(is_object($user) ? $user->toArray() : [ 'не авторизован' ]);
-
-            echo session_name();
 
         }
 
@@ -28,20 +33,19 @@ namespace Phalcon\UsersAuth\Controllers {
         public function registerAction()
         {
 
-            $form = new \Phalcon\UsersAuth\Forms\RegisterForm();
+            $form = new RegisterForm();
 
             if ( $this->request->isPost() ) {
 
                 if ( $form->isValid($this->request->getPost()) != false ) {
 
-                    $user = new \Phalcon\UsersAuth\Models\Users();
+                    $user = new Users();
 
                     $user->assign(
                         [
-                        'name'        => $this->request->getPost('name' , 'striptags') ,
-                        'email'       => $this->request->getPost('email') ,
-                        'password'    => $this->security->hash($this->request->getPost('password')) ,
-                        'profiles_id' => 2
+                        'name'     => $this->request->getPost('name' , 'striptags') ,
+                        'email'    => $this->request->getPost('email') ,
+                        'password' => $this->security->hash($this->request->getPost('password')) ,
                         ]
                     );
 
@@ -73,31 +77,30 @@ namespace Phalcon\UsersAuth\Controllers {
 
             $code = $this->dispatcher->getParam('code');
 
-            $confirmation = \Phalcon\UsersAuth\Models\EmailConfirmations::findFirstByCode($code);
+            $confirmation = EmailConfirmations::findFirstByCode($code);
 
             if ( !$confirmation ) {
 
                 return $this->dispatcher->forward([ 'action' => 'index' ]);
             }
 
-            /*
             $email = $this->dispatcher->getParam('email');
             if ( $confirmation->user->email != $email ) {
 
                 $this->flash->error('email and code not found');
+
                 return $this->dispatcher->forward([ 'action' => 'index' ]);
             }
-            */
 
 
-            if ( $confirmation->confirmed <> 'N' ) {
+            if ( $confirmation->confirmed <> Users::FALSE ) {
 
                 return $this->dispatcher->forward([ 'action' => 'login' ]);
             }
 
-            $confirmation->confirmed = 'Y';
+            $confirmation->confirmed = Users::TRUE;
 
-            $confirmation->user->active = 'Y';
+            $confirmation->user->active = Users::TRUE;
 
             /**
              * Change the confirmation to 'confirmed' and update the user to 'active'
@@ -119,7 +122,7 @@ namespace Phalcon\UsersAuth\Controllers {
             /**
              * Check if the user must change his/her password
              */
-            if ( $confirmation->user->must_change_password == 'Y' ) {
+            if ( $confirmation->user->must_change_password == Users::TRUE ) {
 
                 $this->flash->success('The email was successfully confirmed. Now you must change your password');
 
@@ -132,9 +135,14 @@ namespace Phalcon\UsersAuth\Controllers {
 
         }
 
+        /**
+         * Step 3 - login
+         *
+         * @return \Phalcon\Http\Response|\Phalcon\Http\ResponseInterface
+         */
         public function loginAction()
         {
-            $form = new \Phalcon\UsersAuth\Forms\LoginForm();
+            $form = new LoginForm();
 
             try {
 
@@ -160,11 +168,11 @@ namespace Phalcon\UsersAuth\Controllers {
                             )
                         );
 
-                        return $this->response->redirect('user');
+                        return $this->response->redirect();
                     }
                 }
 
-            } catch ( \Phalcon\UsersAuth\Library\Auth\Exception\Exception $e ) {
+            } catch ( Exception $e ) {
 
                 $this->flash->error($e->getMessage());
             }
@@ -172,38 +180,49 @@ namespace Phalcon\UsersAuth\Controllers {
             $this->view->form = $form;
         }
 
+        /**
+         * Step 4 - logout
+         *
+         * @return \Phalcon\Http\ResponseInterface
+         */
         public function logoutAction()
         {
 
             $this->auth->remove();
 
-            return $this->response->redirect('user');
+            return $this->response->redirect($this->url->get([ 'for' => 'index' ]));
         }
 
+        /**
+         * Step 5 - forgot password
+         *
+         */
         public function forgotAction()
         {
 
-            $form = new \Phalcon\UsersAuth\Forms\ForgotPasswordForm();
+            $form = new ForgotPasswordForm();
 
             if ( $this->request->isPost() ) {
 
                 if ( $form->isValid($this->request->getPost()) == false ) {
+
                     foreach ( $form->getMessages() as $message ) {
                         $this->flash->error($message);
                     }
                 } else {
 
-                    $user = \Phalcon\UsersAuth\Models\Users::findFirstByEmail($this->request->getPost('email'));
+                    $user = Users::findFirstByEmail($this->request->getPost('email'));
                     if ( !$user ) {
                         $this->flash->notice('There is no account associated to this email');
                     } else {
 
-                        $resetPassword           = new \Phalcon\UsersAuth\Models\ResetPasswords();
+                        $resetPassword           = new ResetPasswords();
                         $resetPassword->users_id = $user->id;
                         if ( $resetPassword->save() ) {
 
                             $this->flash->success('Success! Please check your messages for an email reset password');
                         } else {
+
                             foreach ( $resetPassword->getMessages() as $message ) {
 
                                 $this->flash->error($message);
@@ -216,12 +235,16 @@ namespace Phalcon\UsersAuth\Controllers {
             $this->view->form = $form;
         }
 
-
+        /**
+         * Step 6 - reset password
+         *
+         * @return mixed
+         */
         public function resetPasswordAction()
         {
             $code = $this->dispatcher->getParam('code');
 
-            $resetPassword = \Phalcon\UsersAuth\Models\ResetPasswords::findFirstByCode($code);
+            $resetPassword = ResetPasswords::findFirstByCode($code);
 
             if ( !$resetPassword ) {
                 return $this->dispatcher->forward(
@@ -231,7 +254,7 @@ namespace Phalcon\UsersAuth\Controllers {
                 );
             }
 
-            if ( $resetPassword->reset <> 'N' ) {
+            if ( $resetPassword->reset <> Users::FALSE ) {
                 return $this->dispatcher->forward(
                     array(
                          'action' => 'login'
@@ -239,7 +262,7 @@ namespace Phalcon\UsersAuth\Controllers {
                 );
             }
 
-            $resetPassword->reset = 'Y';
+            $resetPassword->reset = Users::TRUE;
 
             /**
              * Change the confirmation to 'reset'
@@ -274,12 +297,14 @@ namespace Phalcon\UsersAuth\Controllers {
 
 
         /**
+         * Step 7 - change password
+         *
          * Users must use this action to change its password
          *
          */
         public function changePasswordAction()
         {
-            $form = new \Phalcon\UsersAuth\Forms\ChangePasswordForm();
+            $form = new ChangePasswordForm();
 
             if ( $this->request->isPost() ) {
 
@@ -294,9 +319,9 @@ namespace Phalcon\UsersAuth\Controllers {
                     $user = $this->auth->getUser();
 
                     $user->password             = $this->security->hash($this->request->getPost('password'));
-                    $user->must_change_password = 'N';
+                    $user->must_change_password = Users::FALSE;
 
-                    $passwordChange             = new \Phalcon\UsersAuth\Models\PasswordChanges();
+                    $passwordChange             = new PasswordChanges();
                     $passwordChange->user       = $user;
                     $passwordChange->ip_address = $this->request->getClientAddress();
                     $passwordChange->user_agent = $this->request->getUserAgent();
@@ -318,6 +343,7 @@ namespace Phalcon\UsersAuth\Controllers {
         }
 
         /**
+         * Step 7 - edit user data
          * User from the 'edit' action
          *
          * @return mixed
@@ -327,7 +353,7 @@ namespace Phalcon\UsersAuth\Controllers {
 
             $user_id = $this->auth->getUser()->id;
 
-            $user = \Phalcon\UsersAuth\Models\Users::findFirstById($user_id);
+            $user = Users::findFirstById($user_id);
 
             if ( !$user ) {
 
@@ -336,7 +362,7 @@ namespace Phalcon\UsersAuth\Controllers {
                 return $this->dispatcher->forward(array( 'action' => 'index' ));
             }
 
-            $form = new \Phalcon\UsersAuth\Forms\UsersForm($user , array( 'edit' => true ));
+            $form = new UsersForm($user , array( 'edit' => true ));
 
             if ( $this->request->isPost() ) {
 
@@ -369,4 +395,3 @@ namespace Phalcon\UsersAuth\Controllers {
         }
     }
 }
-

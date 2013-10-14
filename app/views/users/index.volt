@@ -5,3 +5,5 @@
 </div>
 
 {{ content() }}
+
+Hello {{ authUser ? authUser.name : 'Guest' }}

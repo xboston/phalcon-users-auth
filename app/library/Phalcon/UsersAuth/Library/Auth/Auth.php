@@ -15,6 +15,26 @@ namespace Phalcon\UsersAuth\Library\Auth {
     class Auth extends Component
     {
 
+        protected $authConfig;
+
+        public function __construct(\Phalcon\Config $config)
+        {
+
+            $default_config   = [ ];
+            $this->authConfig = new \Phalcon\Config($default_config);
+
+            $this->authConfig->merge($config);
+        }
+
+        /**
+         * @return \Phalcon\Config
+         */
+        public function getAuthConfig()
+        {
+
+            return $this->authConfig;
+        }
+
         /**
          * Checks the user credentials
          *
@@ -205,18 +225,16 @@ namespace Phalcon\UsersAuth\Library\Auth {
                             //Register the successful login
                             $this->saveSuccessLogin($user);
 
-                            return $this->response->redirect('user');
+                            return $this->authConfig->redirects->afterLoginWithRemember ? $this->response->redirect($this->url->get($this->authConfig->redirects->afterLoginWithRemember)) : false;
                         }
                     }
-
                 }
-
             }
 
             $this->cookies->get('RMU')->delete();
             $this->cookies->get('RMT')->delete();
 
-            return $this->response->redirect('user/login');
+            return $this->authConfig->redirects->afterLoginWithRememberError ? $this->response->redirect($this->url->get($this->authConfig->redirects->afterLoginWithRememberError)) : false;
         }
 
         /**
@@ -228,17 +246,17 @@ namespace Phalcon\UsersAuth\Library\Auth {
          */
         public function checkUserFlags(Users $user)
         {
-            if ( $user->active <> 'Y' ) {
+            if ( $user->active <> Users::TRUE ) {
 
                 throw new Exception('The user is inactive');
             }
 
-            if ( $user->banned <> 'N' ) {
+            if ( $user->banned <> Users::FALSE ) {
 
                 throw new Exception('The user is banned');
             }
 
-            if ( $user->suspended <> 'N' ) {
+            if ( $user->suspended <> Users::FALSE ) {
 
                 throw new Exception('The user is suspended');
             }
@@ -268,6 +286,7 @@ namespace Phalcon\UsersAuth\Library\Auth {
 
         /**
          * Removes the user identity information from session
+         *
          */
         public function remove()
         {
@@ -285,7 +304,7 @@ namespace Phalcon\UsersAuth\Library\Auth {
         }
 
         /**
-         * Auths the user by his/her id
+         * Auth the user by his/her id
          *
          * @param $id
          *
@@ -294,7 +313,7 @@ namespace Phalcon\UsersAuth\Library\Auth {
         public function authUserById($id)
         {
             $user = Users::findFirstById($id);
-            if ( $user == false ) {
+            if ( false == $user ) {
 
                 throw new Exception('The user does not exist');
             }
@@ -324,7 +343,7 @@ namespace Phalcon\UsersAuth\Library\Auth {
             if ( isset($identity['id']) ) {
 
                 $user = Users::findFirstById($identity['id']);
-                if ( $user == false ) {
+                if ( false == $user  ) {
 
                     throw new Exception('The user does not exist');
                 }

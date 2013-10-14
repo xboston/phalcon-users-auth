@@ -126,9 +126,9 @@ $di->setShared(
  */
 $di->setShared(
     'auth' ,
-    function () {
+    function () use($config) {
 
-        return new Phalcon\UsersAuth\Library\Auth\Auth();
+        return new Phalcon\UsersAuth\Library\Auth\Auth($config->plugins->UsersAuth);
     }
 );
 
@@ -143,24 +143,13 @@ $di->setShared(
     }
 );
 
-/**
- * Access Control List
- */
-$di->setShared(
-    'acl' ,
-    function () {
-
-        return new Phalcon\UsersAuth\Library\Acl\Acl();
-    }
-);
-
 $di->setShared(
     'dispatcher' ,
     function () use ($di) {
 
         $eventsManager = $di->getShared('eventsManager');
 
-        $acl_plugin = new Phalcon\UsersAuth\Plugin\Acl($di);
+        $acl_plugin = new Phalcon\UsersAuth\Plugin\Auth($di);
         $eventsManager->attach('dispatch' , $acl_plugin);
 
         $dispatcher = new Phalcon\Mvc\Dispatcher();

@@ -62,7 +62,7 @@ namespace Phalcon\UsersAuth\Models {
             $this->code = preg_replace('/[^a-zA-Z0-9]/' , '' , base64_encode(openssl_random_pseudo_bytes(24)));
 
             //Set status to non-confirmed
-            $this->reset = 'N';
+            $this->reset = Users::FALSE;
         }
 
         /**

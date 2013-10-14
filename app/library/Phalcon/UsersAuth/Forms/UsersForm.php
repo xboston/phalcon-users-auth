@@ -2,9 +2,8 @@
 
 namespace Phalcon\UsersAuth\Forms {
 
-    use Phalcon\Forms\Form , Phalcon\Forms\Element\Text , Phalcon\Forms\Element\Hidden , Phalcon\Forms\Element\Select , Phalcon\Forms\Element\Submit , Phalcon\Forms\Element\Check ,
-        Phalcon\Validation\Validator\PresenceOf , Phalcon\Validation\Validator\Email , Phalcon\Validation\Validator\Identical , Phalcon\Validation\Validator\StringLength ,
-        Phalcon\Validation\Validator\Confirmation;
+    use Phalcon\UsersAuth\Models\Users, Phalcon\Forms\Form , Phalcon\Forms\Element\Text , Phalcon\Forms\Element\Hidden , Phalcon\Forms\Element\Submit , Phalcon\Forms\Element\Check ,
+        Phalcon\Validation\Validator\PresenceOf , Phalcon\Validation\Validator\Email , Phalcon\Validation\Validator\Identical;
 
     class UsersForm extends Form
     {
@@ -30,16 +29,16 @@ namespace Phalcon\UsersAuth\Forms {
             $this->add($email);
 
             //Banned
-            $banned = new Check('banned' , [ 'value' => 'Y' ]);
+            $banned = new Check('banned' , [ 'value' => Users::TRUE ]);
             $banned->setLabel('User banned?');
             $this->add($banned);
-            $this->add(new Hidden('banned-hidden' , [ 'name' => 'banned' , 'value' => 'N' ]));
+            $this->add(new Hidden('banned-hidden' , [ 'name' => 'banned' , 'value' => Users::FALSE ]));
 
             //Suspended
-            $suspended = new Check('suspended' , [ 'value' => 'Y' ]);
+            $suspended = new Check('suspended' , [ 'value' => Users::TRUE ]);
             $suspended->setLabel('User suspended?');
             $this->add($suspended);
-            $this->add(new Hidden('suspended-hidden' , [ 'name' => 'suspended' , 'value' => 'N' ]));
+            $this->add(new Hidden('suspended-hidden' , [ 'name' => 'suspended' , 'value' => Users::FALSE ]));
 
 
             //CSRF

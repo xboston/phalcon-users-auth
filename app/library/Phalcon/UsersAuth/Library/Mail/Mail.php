@@ -13,31 +13,6 @@ namespace Phalcon\UsersAuth\Library\Mail {
     class Mail extends Component
     {
 
-        /**
-         * Applies a template to be used in the e-mail
-         *
-         * @param string $name
-         * @param array  $params
-         */
-        public function getTemplate($name , $params)
-        {
-
-            $parameters = array_merge(
-                array(
-                     'publicUrl' => $this->config->application->siteUri ,
-                ) ,
-                $params
-            );
-
-            return $this->view->getRender(
-                'emailTemplates' ,
-                $name ,
-                $parameters ,
-                function ($view) {
-                    $view->setRenderLevel(View::LEVEL_LAYOUT);
-                }
-            );
-        }
 
         /**
          * Sends e-mails
@@ -50,13 +25,7 @@ namespace Phalcon\UsersAuth\Library\Mail {
         public function send($to , $subject , $name , $params)
         {
 
-            //Settings
-            //$mailSettings = $this->config->mail;
-
-            // Email template
-            //$template = $this->getTemplate($name , $params);
-
-            file_put_contents(ROOT . '/var/mails/mail-' . time() , sprintf("%s :: %s :: %s  :: (%s)" , json_encode($to) , $subject , $name , json_encode($params)));
+            file_put_contents(PUBLICROOT . '/var/mails/mail-' . time() , sprintf("%s :: %s :: %s  :: (%s)" , json_encode($to) , $subject , $name , json_encode($params)));
         }
     }
 }

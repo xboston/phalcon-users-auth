@@ -5,3 +5,5 @@
 </div>
 
 <?php echo $this->getContent(); ?>
+
+Hello <?php echo ($authUser ? $authUser->name : 'Guest'); ?>

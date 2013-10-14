@@ -11,6 +11,11 @@ namespace Phalcon\UsersAuth\Models {
      */
     class Users extends Model
     {
+
+        const TRUE = 'Y';
+        const FALSE = 'N';
+
+
         /**
          * @var integer
          */
@@ -54,16 +59,6 @@ namespace Phalcon\UsersAuth\Models {
 
         public function initialize()
         {
-
-            $this->belongsTo(
-                'profiles_id' ,
-                'Phalcon\UsersAuth\Models\Profiles' ,
-                'id' ,
-                [
-                'alias'    => 'profile' ,
-                'reusable' => true
-                ]
-            );
 
             $this->hasMany(
                 'id' ,
@@ -115,25 +110,25 @@ namespace Phalcon\UsersAuth\Models {
                 $tempPassword = preg_replace('/[^a-zA-Z0-9]/' , '' , base64_encode(openssl_random_pseudo_bytes(12)));
 
                 //The user must change its password in first login
-                $this->must_change_password = 'Y';
+                $this->must_change_password = Users::TRUE;
 
                 //Use this password as default
                 $this->password = $this->getDI()->getSecurity()->hash($tempPassword);
 
             } else {
-                //The user must not change its password in first login
-                $this->must_change_password = 'N';
 
+                //The user must not change its password in first login
+                $this->must_change_password = Users::FALSE;
             }
 
             //The account must be confirmed via e-mail
-            $this->active = 'N';
+            $this->active = Users::FALSE;
 
             //The account is not suspended by default
-            $this->suspended = 'N';
+            $this->suspended = Users::FALSE;
 
             //The account is not banned by default
-            $this->banned = 'N';
+            $this->banned = Users::FALSE;
         }
 
         /**
@@ -141,7 +136,7 @@ namespace Phalcon\UsersAuth\Models {
          */
         public function afterSave()
         {
-            if ( $this->active == 'N' ) {
+            if ( $this->active == Users::FALSE ) {
 
                 $emailConfirmation = new EmailConfirmations();
 
