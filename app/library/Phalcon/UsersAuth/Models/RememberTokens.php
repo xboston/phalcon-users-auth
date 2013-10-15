@@ -11,7 +11,7 @@ namespace Phalcon\UsersAuth\Models {
      */
     class RememberTokens extends Model
     {
-        use \Phalcon\UsersAuth\Models\Traits\Timestampable;
+        use \Phalcon\UsersAuth\Models\Traits\TimeStampable;
 
         /**
          * @var integer

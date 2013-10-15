@@ -10,8 +10,10 @@ $loader->registerDirs(
          $config->application->controllersDir ,
          $config->application->modelsDir
     )
-)->registerNamespaces(
+)->registerNamespaces
+    (
         [
-        'Phalcon\UsersAuth' => $config->application->libraryDir . 'Phalcon/UsersAuth' ,
+        'Phalcon' => $config->application->libraryDir . 'Phalcon' ,
         ]
-    )->register();
+    )
+->register();

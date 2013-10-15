@@ -9,7 +9,7 @@
 namespace Phalcon\UsersAuth\Models\Traits {
 
 
-    trait Timestampable
+    trait TimeStampable
     {
 
         public function beforeCreate()

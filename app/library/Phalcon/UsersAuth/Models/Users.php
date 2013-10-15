@@ -12,7 +12,7 @@ namespace Phalcon\UsersAuth\Models {
     class Users extends Model
     {
 
-        use \Phalcon\UsersAuth\Models\Traits\Timestampable;
+        use \Phalcon\UsersAuth\Models\Traits\TimeStampable;
 
         const TRUE  = 1;
         const FALSE = 0;
