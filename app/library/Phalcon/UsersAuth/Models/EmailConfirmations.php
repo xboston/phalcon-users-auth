@@ -11,6 +11,8 @@ namespace Phalcon\UsersAuth\Models {
      */
     class EmailConfirmations extends Model
     {
+        use \Phalcon\UsersAuth\Models\Traits\Timestampable;
+
         /**
          * @var integer
          */
@@ -21,19 +23,25 @@ namespace Phalcon\UsersAuth\Models {
          */
         public $users_id;
 
+        /**
+         * @var string
+         */
         public $code;
 
         /**
-         * @var integer
+         * @var string
+         */
+        public $confirmed;
+
+        /**
+         * @var string
          */
         public $created_at;
 
         /**
-         * @var integer
+         * @var string
          */
         public $modified_at;
-
-        public $confirmed;
 
         public function initialize()
         {
@@ -50,8 +58,6 @@ namespace Phalcon\UsersAuth\Models {
          */
         public function beforeValidationOnCreate()
         {
-            //Timestamp the confirmaton
-            $this->created_at = time();
 
             //Generate a random confirmation code
             // @todo - использовать нативный генератор
@@ -79,7 +85,7 @@ namespace Phalcon\UsersAuth\Models {
                 [ $this->user->email => $this->user->name ] ,
                 "Please confirm your email" ,
                 'confirmation' ,
-                [ 'confirmUrl' => '/confirm/' . $this->code . '/' . $this->user->email ]
+                [ 'confirmUrl' => $this->getDI()->getUrl()->get([ 'for' => 'confirm-email' , 'code' => $this->code , 'email' => $this->user->email ]) ]
             );
         }
     }

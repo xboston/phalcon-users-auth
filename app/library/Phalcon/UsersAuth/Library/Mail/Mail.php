@@ -25,7 +25,7 @@ namespace Phalcon\UsersAuth\Library\Mail {
         public function send($to , $subject , $name , $params)
         {
 
-            file_put_contents(PUBLICROOT . '/var/mails/mail-' . time() , sprintf("%s :: %s :: %s  :: (%s)" , json_encode($to) , $subject , $name , json_encode($params)));
+            file_put_contents(PUBLIC_ROOT . '/var/mails/mail-' . time() , sprintf("%s :: %s :: %s  :: (%s)" , json_encode($to) , $subject , $name , json_encode($params)));
         }
     }
 }

@@ -60,7 +60,6 @@ namespace Phalcon\UsersAuth\Controllers {
 
                     $this->flash->error($user->getMessages());
                 }
-
             }
 
             $this->view->form = $form;
@@ -81,29 +80,29 @@ namespace Phalcon\UsersAuth\Controllers {
 
             if ( !$confirmation ) {
 
-                return $this->dispatcher->forward([ 'action' => 'index' ]);
+                $this->flash->error('Code not found');
+                return $this->response->redirect(['for'=>'login']);
             }
 
             $email = $this->dispatcher->getParam('email');
             if ( $confirmation->user->email != $email ) {
 
-                $this->flash->error('email and code not found');
-
-                return $this->dispatcher->forward([ 'action' => 'index' ]);
+                $this->flash->error('Email not found');
+                return $this->response->redirect(['for'=>'login']);
             }
 
 
             if ( $confirmation->confirmed <> Users::FALSE ) {
 
-                return $this->dispatcher->forward([ 'action' => 'login' ]);
+                return $this->response->redirect(['for'=>'login']);
             }
 
             $confirmation->confirmed = Users::TRUE;
 
-            $confirmation->user->active = Users::TRUE;
+            $confirmation->user->activated = Users::TRUE;
 
             /**
-             * Change the confirmation to 'confirmed' and update the user to 'active'
+             * Change the confirmation to 'confirmed' and update the user to 'activated'
              */
             if ( !$confirmation->save() ) {
 
@@ -111,7 +110,7 @@ namespace Phalcon\UsersAuth\Controllers {
                     $this->flash->error($message);
                 }
 
-                return $this->dispatcher->forward([ 'action' => 'index' ]);
+                return $this->response->redirect(['for'=>'index']);
             }
 
             /**
@@ -126,13 +125,12 @@ namespace Phalcon\UsersAuth\Controllers {
 
                 $this->flash->success('The email was successfully confirmed. Now you must change your password');
 
-                return $this->dispatcher->forward([ 'action' => 'changePassword' ]);
+                return $this->response->redirect(['for'=>'change-password']);
             }
 
             $this->flash->success('The email was successfully confirmed');
 
-            return $this->dispatcher->forward([ 'action' => 'index' ]);
-
+            return $this->response->redirect(['for'=>'index']);
         }
 
         /**

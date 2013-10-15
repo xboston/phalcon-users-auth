@@ -11,6 +11,9 @@ namespace Phalcon\UsersAuth\Models {
      */
     class FailedLogins extends Model
     {
+
+        use \Phalcon\UsersAuth\Models\Traits\Timestampable;
+
         /**
          * @var integer
          */
@@ -30,6 +33,11 @@ namespace Phalcon\UsersAuth\Models {
          * @var integer
          */
         public $attempted;
+
+        /**
+         * @var string
+         */
+        public $created_at;
 
         public function initialize()
         {

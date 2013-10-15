@@ -11,6 +11,8 @@ namespace Phalcon\UsersAuth\Models {
      */
     class SuccessLogins extends Model
     {
+        use \Phalcon\UsersAuth\Models\Traits\Timestampable;
+
         /**
          * @var integer
          */
@@ -30,6 +32,12 @@ namespace Phalcon\UsersAuth\Models {
          * @var string
          */
         public $user_agent;
+
+        /**
+         * @var string
+         */
+        public $created_at;
+
 
         public function initialize()
         {

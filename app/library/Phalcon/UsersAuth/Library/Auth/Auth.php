@@ -207,7 +207,7 @@ namespace Phalcon\UsersAuth\Library\Auth {
                     if ( $remember ) {
 
                         //Check if the cookie has not expired
-                        if ( (time() - (86400 * 8)) < $remember->created_at ) {
+                        if ( (time() - (86400 * 8)) < strtotime($remember->created_at) ) {
 
                             //Check if the user was flagged
                             $this->checkUserFlags($user);
@@ -246,7 +246,7 @@ namespace Phalcon\UsersAuth\Library\Auth {
          */
         public function checkUserFlags(Users $user)
         {
-            if ( $user->active <> Users::TRUE ) {
+            if ( $user->activated <> Users::TRUE ) {
 
                 throw new Exception('The user is inactive');
             }
@@ -325,7 +325,6 @@ namespace Phalcon\UsersAuth\Library\Auth {
                 array(
                      'id'      => $user->id ,
                      'name'    => $user->name ,
-                     'profile' => $user->profile->name
                 )
             );
 

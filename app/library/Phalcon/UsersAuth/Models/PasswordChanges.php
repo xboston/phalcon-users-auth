@@ -11,6 +11,8 @@ namespace Phalcon\UsersAuth\Models {
      */
     class PasswordChanges extends Model
     {
+        use \Phalcon\UsersAuth\Models\Traits\Timestampable;
+
         /**
          * @var integer
          */
@@ -32,22 +34,13 @@ namespace Phalcon\UsersAuth\Models {
         public $user_agent;
 
         /**
-         * @var integer
+         * @var string
          */
         public $created_at;
 
         public function initialize()
         {
             $this->belongsTo('users_id' , 'Phalcon\UsersAuth\Models\Users' , 'id' , [ 'alias' => 'user' ]);
-        }
-
-        /**
-         * Before create the user assign a password
-         */
-        public function beforeValidationOnCreate()
-        {
-            //Timestamp the confirmaton
-            $this->created_at = time();
         }
     }
 }

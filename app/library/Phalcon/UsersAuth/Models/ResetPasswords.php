@@ -13,6 +13,8 @@ namespace Phalcon\UsersAuth\Models {
      */
     class ResetPasswords extends Model
     {
+        use \Phalcon\UsersAuth\Models\Traits\Timestampable;
+
         /**
          * @var integer
          */
@@ -29,20 +31,19 @@ namespace Phalcon\UsersAuth\Models {
         public $code;
 
         /**
-         * @var integer
-         */
-        public $created_at;
-
-        /**
-         * @var integer
-         */
-        public $modified_at;
-
-        /**
          * @var string
          */
         public $reset;
 
+        /**
+         * @var string
+         */
+        public $created_at;
+
+        /**
+         * @var string
+         */
+        public $modified_at;
 
         public function initialize()
         {
@@ -54,8 +55,6 @@ namespace Phalcon\UsersAuth\Models {
          */
         public function beforeValidationOnCreate()
         {
-            //Timestamp the confirmaton
-            $this->created_at = time();
 
             //Generate a random confirmation code
             // @todo использовать нативный генератор

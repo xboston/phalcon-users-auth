@@ -11,6 +11,8 @@ namespace Phalcon\UsersAuth\Models {
      */
     class RememberTokens extends Model
     {
+        use \Phalcon\UsersAuth\Models\Traits\Timestampable;
+
         /**
          * @var integer
          */
@@ -32,18 +34,9 @@ namespace Phalcon\UsersAuth\Models {
         public $user_agent;
 
         /**
-         * @var integer
+         * @var string
          */
         public $created_at;
-
-        /**
-         * Before create the user assign a password
-         */
-        public function beforeValidationOnCreate()
-        {
-            //Timestamp the confirmaton
-            $this->created_at = time();
-        }
 
         public function initialize()
         {

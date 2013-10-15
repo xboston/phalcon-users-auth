@@ -12,9 +12,10 @@ namespace Phalcon\UsersAuth\Models {
     class Users extends Model
     {
 
-        const TRUE = 'Y';
-        const FALSE = 'N';
+        use \Phalcon\UsersAuth\Models\Traits\Timestampable;
 
+        const TRUE  = 1;
+        const FALSE = 0;
 
         /**
          * @var integer
@@ -37,25 +38,34 @@ namespace Phalcon\UsersAuth\Models {
         public $password;
 
         /**
-         * @var string
+         * @var integer
          */
         public $must_change_password;
 
         /**
-         * @var string
+         * @var integer
          */
         public $banned;
 
         /**
-         * @var string
+         * @var integer
          */
         public $suspended;
 
         /**
+         * @var integer
+         */
+        public $activated;
+
+        /**
          * @var string
          */
-        public $active;
+        public $created_at;
 
+        /**
+         * @var string
+         */
+        public $modified_at;
 
         public function initialize()
         {
@@ -122,7 +132,7 @@ namespace Phalcon\UsersAuth\Models {
             }
 
             //The account must be confirmed via e-mail
-            $this->active = Users::FALSE;
+            $this->activated = Users::FALSE;
 
             //The account is not suspended by default
             $this->suspended = Users::FALSE;
@@ -136,7 +146,7 @@ namespace Phalcon\UsersAuth\Models {
          */
         public function afterSave()
         {
-            if ( $this->active == Users::FALSE ) {
+            if ( $this->activated == Users::FALSE ) {
 
                 $emailConfirmation = new EmailConfirmations();
 
@@ -145,6 +155,10 @@ namespace Phalcon\UsersAuth\Models {
                 if ( $emailConfirmation->save() ) {
                     $this->getDI()->getFlash()->notice(
                         'A confirmation mail has been sent to ' . $this->email
+                    );
+                }else{
+                    $this->getDI()->getFlash()->notice(
+                        'Error email send to ' . $this->email
                     );
                 }
             }
