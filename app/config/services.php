@@ -92,7 +92,12 @@ $di->setShared(
  * Phalcon\UsersAuth
  *
  */
-
+$di->setShared(
+    'config' ,
+    function () use ($config) {
+        return $config;
+    }
+);
 /**
  * Start the session the first time some component request the session service
  */
