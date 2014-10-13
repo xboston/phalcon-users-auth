@@ -64,7 +64,7 @@ DROP TABLE IF EXISTS `reset_passwords`;
 CREATE TABLE `reset_passwords` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `users_id` int(11) unsigned NOT NULL,
-  `code` tinyint(1) unsigned NOT NULL,
+  `code` char(32) NOT NULL,
   `reset` tinyint(1) unsigned NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `modified_at` datetime DEFAULT NULL,
